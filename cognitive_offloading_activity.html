@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI and Cognitive Offloading - Pathway Activity</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Sans+3:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red:        #A6192E;
+    --charcoal:   #373A36;
+    --sand:       #EDEBE5;
+    --purple:     #80225F;
+    --deep-red:   #76232F;
+    --bright-red: #D6001C;
+    --magenta:    #C6007E;
+    --white:      #FFFFFF;
+    --mid-gray:   #8A8880;
+    --light-sand: #F5F3EE;
+    --card-bg:    #2A2C2A;
+    --path1:      #A6192E;
+    --path2:      #80225F;
+    --path3:      #C6007E;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Source Sans 3', sans-serif;
+    background: var(--charcoal);
+    color: var(--sand);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--deep-red);
+    border-top: 5px solid var(--bright-red);
+    padding: 2rem 2.5rem 1.8rem;
+    position: relative;
+    overflow: hidden;
+  }
+  header::after {
+    content: '';
+    position: absolute;
+    right: -60px; top: -60px;
+    width: 220px; height: 220px;
+    border-radius: 50%;
+    background: rgba(166,25,46,0.22);
+    pointer-events: none;
+  }
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+    font-weight: 900;
+    color: var(--white);
+    line-height: 1.15;
+    max-width: 680px;
+  }
+  header p {
+    margin-top: 0.65rem;
+    font-size: 0.95rem;
+    color: rgba(237,235,229,0.75);
+    max-width: 620px;
+    line-height: 1.55;
+  }
+
+  /* ── PATH LEGEND ── */
+  .legend {
+    display: flex;
+    gap: 0.5rem;
+    padding: 1rem 2.5rem;
+    background: #2E302D;
+    border-bottom: 1px solid rgba(237,235,229,0.07);
+    flex-wrap: wrap;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 0.35rem 0.8rem;
+    border-radius: 3px;
+    border: 1px solid rgba(237,235,229,0.08);
+  }
+  .legend-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .p1 .legend-dot { background: var(--path1); }
+  .p2 .legend-dot { background: var(--path2); }
+  .p3 .legend-dot { background: var(--path3); }
+  .legend-label { color: var(--sand); }
+  .legend-sub { color: var(--mid-gray); font-weight: 300; font-size: 0.76rem; }
+
+  /* ── PROGRESS ── */
+  .progress-wrap {
+    padding: 1.1rem 2.5rem 0.4rem;
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+  }
+  .progress-bar-track {
+    flex: 1;
+    height: 4px;
+    background: rgba(237,235,229,0.1);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--red);
+    border-radius: 2px;
+    transition: width 0.5s ease;
+  }
+  .progress-text {
+    font-size: 0.78rem;
+    color: var(--mid-gray);
+    white-space: nowrap;
+    font-weight: 300;
+  }
+  .score-badge {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--sand);
+    background: rgba(166,25,46,0.22);
+    border: 1px solid var(--red);
+    padding: 0.2rem 0.7rem;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+
+  /* ── MAIN ── */
+  main {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 1.8rem 2rem 5rem;
+  }
+
+  /* ── SCENARIO CARD ── */
+  .scenario-card {
+    background: var(--card-bg);
+    border: 1px solid rgba(237,235,229,0.09);
+    border-radius: 2px;
+    overflow: hidden;
+    animation: slideUp 0.38s ease both;
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .scenario-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.1rem;
+    padding: 1.5rem 1.6rem 1.2rem;
+    border-bottom: 1px solid rgba(237,235,229,0.07);
+  }
+  .scenario-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--red);
+    line-height: 1;
+    flex-shrink: 0;
+    width: 2rem;
+    padding-top: 3px;
+  }
+  .scenario-meta { flex: 1; }
+  .scenario-subject {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--mid-gray);
+    margin-bottom: 0.4rem;
+  }
+  .scenario-text {
+    font-size: 1rem;
+    line-height: 1.65;
+    color: var(--sand);
+  }
+  .scenario-text strong { color: var(--white); font-weight: 600; }
+  .scenario-text em { font-style: italic; color: rgba(237,235,229,0.85); }
+
+  /* ── CHOICES ── */
+  .choices {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    padding: 1.2rem 1.6rem;
+  }
+  .choice-btn {
+    flex: 1;
+    min-width: 175px;
+    background: transparent;
+    border: 1.5px solid rgba(237,235,229,0.13);
+    border-radius: 2px;
+    padding: 0.8rem 1rem 0.8rem 1.15rem;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.18s, background 0.18s;
+    position: relative;
+    overflow: hidden;
+  }
+  .choice-btn::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    opacity: 0;
+    transition: opacity 0.18s;
+  }
+  .choice-btn.p1::before { background: var(--path1); }
+  .choice-btn.p2::before { background: var(--path2); }
+  .choice-btn.p3::before { background: var(--path3); }
+  .choice-btn.pN::before { background: var(--mid-gray); }
+
+  .choice-btn:hover:not(:disabled) {
+    border-color: rgba(237,235,229,0.32);
+    background: rgba(237,235,229,0.04);
+  }
+  .choice-btn:hover:not(:disabled)::before { opacity: 1; }
+  .choice-btn:disabled { cursor: default; }
+
+  .choice-path-label {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin-bottom: 0.18rem;
+    display: block;
+  }
+  .p1 .choice-path-label { color: #d44055; }
+  .p2 .choice-path-label { color: #b0558e; }
+  .p3 .choice-path-label { color: #d94fb0; }
+  .pN .choice-path-label { color: var(--mid-gray); }
+
+  .choice-desc {
+    font-size: 0.81rem;
+    color: var(--mid-gray);
+    line-height: 1.4;
+    font-weight: 300;
+    display: block;
+  }
+
+  /* answered states */
+  .choice-btn.is-correct {
+    border-width: 2px;
+  }
+  .choice-btn.is-correct.p1 { border-color: var(--path1); background: rgba(166,25,46,0.1); }
+  .choice-btn.is-correct.p2 { border-color: var(--path2); background: rgba(128,34,95,0.1); }
+  .choice-btn.is-correct.p3 { border-color: var(--path3); background: rgba(198,0,126,0.1); }
+  .choice-btn.is-correct.pN { border-color: var(--mid-gray); background: rgba(138,136,128,0.1); }
+  .choice-btn.is-correct::before { opacity: 1; }
+
+  .choice-btn.is-wrong  { opacity: 0.35; border-color: rgba(237,235,229,0.07); }
+  .choice-btn.is-dim    { opacity: 0.3; }
+
+  .result-tick {
+    display: none;
+    position: absolute;
+    right: 0.8rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.95rem;
+  }
+  .choice-btn.is-correct .result-tick { display: block; }
+
+  /* ── FEEDBACK ── */
+  .feedback {
+    display: none;
+    padding: 1.1rem 1.6rem 1.4rem;
+    border-top: 1px solid rgba(237,235,229,0.07);
+    animation: fadeIn 0.3s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .feedback.show { display: block; }
+
+  .feedback-result {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin-bottom: 0.6rem;
+  }
+  .feedback-icon { font-size: 1.05rem; flex-shrink: 0; }
+  .feedback-verdict {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    font-weight: 700;
+  }
+  .feedback-verdict.ok  { color: var(--sand); }
+  .feedback-verdict.bad { color: var(--bright-red); }
+
+  .feedback-body {
+    font-size: 0.88rem;
+    line-height: 1.68;
+    color: rgba(237,235,229,0.72);
+  }
+  .feedback-body strong { color: var(--sand); font-weight: 600; }
+
+  .feedback-cite {
+    margin-top: 0.55rem;
+    font-size: 0.75rem;
+    color: var(--mid-gray);
+    font-style: italic;
+  }
+
+  /* ── NEXT BUTTON ── */
+  .next-wrap {
+    display: none;
+    padding: 0 1.6rem 1.4rem;
+    justify-content: flex-end;
+  }
+  .next-wrap.show { display: flex; }
+  .btn-next {
+    background: var(--red);
+    color: var(--white);
+    border: none;
+    padding: 0.7rem 1.8rem;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: background 0.18s;
+  }
+  .btn-next:hover { background: var(--bright-red); }
+
+  /* ── RESULTS ── */
+  #results-panel {
+    display: none;
+    background: var(--deep-red);
+    border: 1px solid rgba(237,235,229,0.1);
+    border-radius: 2px;
+    padding: 2.5rem;
+    text-align: center;
+    animation: slideUp 0.4s ease;
+  }
+  #results-panel h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.9rem;
+    font-weight: 900;
+    color: var(--white);
+    margin-bottom: 0.4rem;
+  }
+  .score-display {
+    font-family: 'Playfair Display', serif;
+    font-size: 5rem;
+    font-weight: 900;
+    color: var(--sand);
+    line-height: 1;
+    margin: 0.8rem 0 0.2rem;
+  }
+  .score-label {
+    font-size: 0.82rem;
+    color: rgba(237,235,229,0.55);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-weight: 600;
+  }
+  .path-breakdown {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin: 1.6rem 0 0.5rem;
+    flex-wrap: wrap;
+  }
+  .path-score-item { text-align: center; }
+  .path-score-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
+    font-weight: 900;
+    display: block;
+  }
+  .path-score-num.p1 { color: #e05068; }
+  .path-score-num.p2 { color: #c05898; }
+  .path-score-num.p3 { color: #e060b8; }
+  .path-score-num.pN { color: var(--mid-gray); }
+  .path-score-label {
+    font-size: 0.73rem;
+    color: rgba(237,235,229,0.45);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    line-height: 1.4;
+  }
+  .result-message {
+    margin: 1rem auto 0;
+    max-width: 500px;
+    font-size: 0.93rem;
+    line-height: 1.62;
+    color: rgba(237,235,229,0.78);
+  }
+  .btn-retry {
+    margin-top: 1.6rem;
+    background: var(--red);
+    color: var(--white);
+    border: none;
+    padding: 0.8rem 2.2rem;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: background 0.18s;
+  }
+  .btn-retry:hover { background: var(--bright-red); }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    padding: 1.4rem;
+    font-size: 0.73rem;
+    color: var(--mid-gray);
+    border-top: 1px solid rgba(237,235,229,0.07);
+  }
+
+  @media (max-width: 580px) {
+    header, .legend, .progress-wrap { padding-left: 1.2rem; padding-right: 1.2rem; }
+    main { padding: 1.2rem 1rem 3rem; }
+    .choice-btn { min-width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Which Teaching Pathway Is This?</h1>
+  <p>Read each classroom scenario and decide whether it is an example of <strong style="color:#fff">Path 1</strong> (Load Reduction Instruction), <strong style="color:#fff">Path 2</strong> (Metacognitive Scaffolding), or <strong style="color:#fff">Path 3</strong> (AI as Thinking Partner). One scenario may be none of these.</p>
+</header>
+
+<div class="legend">
+  <div class="legend-item p1">
+    <div class="legend-dot"></div>
+    <span class="legend-label">Path 1</span>
+    <span class="legend-sub">- Load Reduction Instruction</span>
+  </div>
+  <div class="legend-item p2">
+    <div class="legend-dot"></div>
+    <span class="legend-label">Path 2</span>
+    <span class="legend-sub">- Metacognitive Scaffolding</span>
+  </div>
+  <div class="legend-item p3">
+    <div class="legend-dot"></div>
+    <span class="legend-label">Path 3</span>
+    <span class="legend-sub">- AI as Thinking Partner</span>
+  </div>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-bar-track">
+    <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+  </div>
+  <div class="progress-text" id="progress-text">Question 1 of 8</div>
+  <div class="score-badge" id="score-badge">Score: 0</div>
+</div>
+
+<main id="stage"></main>
+
+<div id="results-panel" style="max-width:780px;margin:0 auto 4rem;padding:0 2rem;">
+  <div style="background:var(--deep-red);border:1px solid rgba(237,235,229,0.1);border-radius:2px;padding:2.5rem;text-align:center;">
+    <h2 style="font-family:'Playfair Display',serif;font-size:1.9rem;font-weight:900;color:var(--white);margin-bottom:0.4rem;">Activity Complete</h2>
+    <div class="score-display" id="final-score"></div>
+    <div class="score-label">out of 8</div>
+    <div class="path-breakdown" id="path-breakdown"></div>
+    <p class="result-message" id="result-message"></p>
+    <button class="btn-retry" onclick="resetActivity()">Try Again</button>
+  </div>
+</div>
+
+<footer>
+  Based on Lodge &amp; Loble (2026). <em>Artificial intelligence, cognitive offloading and implications for education.</em> UTS / Network for Quality Digital Education.
+  &nbsp;&nbsp;|&nbsp;&nbsp;
+  Torrington, J., &amp; Ballsun-Stanton, B. (2025). <em>Effective AI Prompting Strategies from the Humanities.</em> Zenodo. <a href="https://doi.org/10.5281/zenodo.15589371" style="color:var(--mid-gray);text-decoration:underline;" target="_blank">https://doi.org/10.5281/zenodo.15589371</a>
+</footer>
+
+<script>
+const scenarios = [
+  {
+    id: 1,
+    subject: "English - Year 10",
+    text: `A teacher assigns a persuasive writing task on climate policy. Before students begin drafting, she tells them: <strong>"Use AI to generate three counter-arguments to your position. Your job is to then select the strongest one, explain why it is the hardest to rebut, and write your own rebuttal."</strong> The AI handles idea generation; the analytical work stays with the student.`,
+    answer: 1,
+    feedback_correct: `Correct! This is <strong>Path 1 - Load Reduction Instruction (LRI)</strong>. The teacher has deliberately directed AI to handle a lower-order task (brainstorming counter-arguments) while preserving the high-order intrinsic work (evaluating, selecting, and rebutting) for the student. This mirrors the Hong et al. (2025) study where students explicitly taught to delegate lower-order writing tasks to AI showed significantly greater critical thinking gains.`,
+    feedback_wrong: `Think about what AI is doing here versus what the student is doing. The teacher has structured the task so AI handles a routine generative task (producing counter-arguments), freeing the student to do the harder cognitive work of evaluation and rebuttal. That careful division of labour - beneficial offloading of extraneous load - is the hallmark of <strong>Path 1: Load Reduction Instruction</strong>.`,
+    cite: "Lodge & Loble (2026), p.24 | Hong et al. (2025) | Martin et al. (2025)",
+  },
+  {
+    id: 2,
+    subject: "History - Year 11",
+    text: `A teacher is preparing students to write an essay on the causes of WWI. Before students interact with AI, she requires them to write a structured opening prompt that includes their existing knowledge of the topic, the specific question they are investigating, and at least two sources they have already read. Students then engage in an iterative back-and-forth with AI - refining their questions, pushing back on responses, and asking for clarification or elaboration across multiple exchanges. They save the full conversation thread and annotate it: highlighting where AI confirmed what they already knew, where it introduced something they needed to verify, and where they challenged or corrected the AI's response. The teacher then requires a mandatory reflection before submission: <em>"What did you already know before this conversation? What did AI tell you that you were able to verify from your sources? Where are you still uncertain - and what would you need to do to resolve that?"</em> Students cannot submit without completing all three fields.`,
+    answer: 2,
+    feedback_correct: `Correct! This is <strong>Path 2 - Metacognitive Scaffolding</strong>. The mandatory annotated conversation and reflection form force students to monitor their own understanding throughout an iterative dialogue - not just at the end. The key word is non-optional: Darvishi et al. (2024) found that simply adding SRL prompts failed because AI's dominance overrode them. Requiring students to annotate the full thread and complete all three reflection fields forces the metacognitive pause at every stage of the interaction.`,
+    feedback_wrong: `Notice that the content task is only part of this scenario - the key pedagogical moves are the annotated conversation thread and the mandatory structured reflection that accompany it. The teacher is requiring students to monitor their thinking throughout an iterative AI dialogue: what they knew, what they verified, where they pushed back, and where they remain uncertain. That ongoing self-regulation - made non-optional - is central to <strong>Path 2: Metacognitive Scaffolding</strong>.`,
+    cite: "Lodge & Loble (2026), p.24-25 | Fan et al. (2024) | Xu et al. (2025) | Darvishi et al. (2024)",
+  },
+  {
+    id: 3,
+    subject: "Mathematics - Year 9",
+    text: `A maths teacher introduces simultaneous equations. Rather than asking students to solve problems directly, he has them teach the method to an AI that is playing the role of a confused student. The AI responds with questions like: <em>"Wait, why did you multiply both sides by 2 there? I don't understand what that achieves."</em> Students must explain their reasoning in response, going back and forth until the AI signals it understands.`,
+    answer: 3,
+    feedback_correct: `Correct! This is <strong>Path 3 - AI as Thinking Partner</strong>, specifically the Cognitive Mirror model (Tomisu et al., 2025). The AI is engineered as a teachable novice that feigns confusion, forcing the student into the effortful act of explanation and reflection - what researchers call the Protege Effect. By explaining the concept to AI, the student must retrieve and organise their own schemas, generating the very desirable difficulty that builds durable knowledge.`,
+    feedback_wrong: `Think about what is unusual in this scenario - the student is not solving a problem or reflecting on a task. They are explaining their own reasoning to an AI that plays confused. That is the Cognitive Mirror model from Tomisu et al. (2025), which belongs to <strong>Path 3: AI as Thinking Partner</strong>. The AI provokes deeper thinking rather than replacing it, triggering what researchers call the Protege Effect.`,
+    cite: "Lodge & Loble (2026), p.25 | Tomisu et al. (2025) | Duplice (2025)",
+  },
+  {
+    id: 4,
+    subject: "Science - Year 8",
+    text: `In a unit on ecosystems, a teacher lets students use AI freely to complete a food web diagram. The AI suggests which organisms to include, draws the connections, and labels everything. The teacher collects the completed diagrams and gives students a participation mark for finishing. <strong>No further task or reflection is required.</strong>`,
+    answer: 0,
+    isDistractor: true,
+    distractorFeedback: `This is a <strong>distractor</strong> - it is an example of detrimental cognitive offloading, not any of the three pathways. The student has outsourced the intrinsic cognitive work (understanding food web relationships, making connections, building ecological schemas) entirely to AI, with no scaffolding, reflection, or redesigned role for the tool. This is precisely the pattern that Bastani et al. (2025) found harms long-term learning: scaffolded performance that does not translate into durable knowledge.`,
+    cite: "Lodge & Loble (2026), p.19-20 | Bastani et al. (2025)",
+  },
+  {
+    id: 5,
+    subject: "English - Year 12",
+    text: `For a creative writing task, the teacher tells students: <strong>"Use AI to review your draft for grammar and spelling errors only. In your prompt to AI, you must instruct it not to rewrite or change any of your sentences - only to identify issues and suggest alternatives for you to consider."</strong> She then provides a printed checklist of structural elements (narrative arc, characterisation, theme development, voice) and requires students to self-assess their draft against each criterion before peer review. The grammar review is an AI-assisted task; all decisions and revisions remain the student's.`,
+    answer: 1,
+    feedback_correct: `Correct! This is <strong>Path 1 - Load Reduction Instruction</strong>. The teacher has made an explicit, pedagogically intentional division: AI handles the extraneous load (grammar and spelling suggestions) so that working memory capacity is freed for the intrinsic cognitive work of structural and creative analysis. Crucially, students are also taught to prompt AI in a way that preserves their agency - instructing it to suggest rather than rewrite. This matches the Load Reduction Instruction (LRI) framework from Martin et al. (2025).`,
+    feedback_wrong: `Look closely at the structure: there are two separate tasks here - one for AI (grammar review, suggestion only) and one for the student (structural self-assessment and all revision decisions). The teacher has deliberately separated extraneous from intrinsic load, and has also taught students to prompt AI in a way that keeps them in control. That explicit division of labour is the defining feature of <strong>Path 1: Load Reduction Instruction</strong>.`,
+    cite: "Lodge & Loble (2026), p.24 | Martin et al. (2025) | Hong et al. (2025)",
+  },
+  {
+    id: 6,
+    subject: "Science - Year 10",
+    text: `In a unit on climate change, a teacher requires students to write a structured opening prompt to AI that includes their current understanding of a chosen climate mechanism, a specific question they want to explore, and the sources they have already consulted. From there, students engage in an iterative conversation - following up AI responses with their own challenges, asking for evidence, and requesting clarification across multiple exchanges. They save the full conversation thread. Alongside it, they complete a running <strong>validation log</strong> with three columns: <em>"AI claim | My source that supports or contradicts this | My judgement: verified / unverified / needs more checking."</em> The log must reflect the full conversation, not just the first response. The teacher collects the original prompt, the full conversation thread, and the completed validation log alongside the final piece of writing.`,
+    answer: 3,
+    feedback_correct: `Correct! This is <strong>Path 3 - AI as Thinking Partner</strong>, specifically the Verification Partner model (Grace, 2025). The student maintains primary cognitive agency throughout - they author the prompts, drive the iterative dialogue, and evaluate every AI claim against their own sources. The running validation log makes the evaluative judgement process visible and accountable. This directly builds the domain-specific knowledge and evaluative judgement that Bearman et al. (2024) identify as the core competency for the age of AI.`,
+    feedback_wrong: `Consider what the student must do throughout this task: author a structured prompt, drive an iterative conversation, challenge AI responses, and cross-check every claim against their own sources in a running log. The AI is not leading - the student is. That sustained, critical evaluation of AI output - with the student retaining agency at every step - is the Verification Partner model (Grace, 2025), which belongs to <strong>Path 3: AI as Thinking Partner</strong>.`,
+    cite: "Lodge & Loble (2026), p.25 | Grace (2025) | Bearman et al. (2024) | Willingham (2019)",
+  },
+  {
+    id: 7,
+    subject: "Design and Technology - Year 9",
+    text: `After students use AI to brainstorm product ideas, the teacher pauses the class and projects this prompt on the board. Students must respond in their design journal before continuing: <strong>"Stop. Before you keep going - which of these AI ideas did you actually understand well enough to evaluate? Write down one idea you are confident about and explain WHY. Write down one idea you are uncertain about. What would you need to know to judge it properly?"</strong>`,
+    answer: 2,
+    feedback_correct: `Correct! This is <strong>Path 2 - Metacognitive Scaffolding</strong>. The teacher has inserted a non-optional metacognitive pause at a critical moment - just as students are about to proceed with AI-generated ideas. The prompt forces them to distinguish between genuine understanding and the illusion of competence: exactly the metacognitive monitoring that Fan et al. (2024) describe as being undermined by AI convenience. Singh et al. (2025) found that these structured reflection prompts led to deeper inquiry and broader topic exploration.`,
+    feedback_wrong: `Notice the teacher's key move: stopping the class to require structured self-reflection before students can continue. This is not about what AI is doing or redesigning AI's role - it is about forcing students to monitor their own understanding of AI-generated content. That is metacognitive scaffolding - specifically countering the illusion of competence risk. This is <strong>Path 2: Metacognitive Scaffolding</strong>.`,
+    cite: "Lodge & Loble (2026), p.24-25 | Fan et al. (2024) | Singh et al. (2025)",
+  },
+  {
+    id: 8,
+    subject: "Geography - Year 11",
+    text: `Students must write a 600-word analysis of urban heat island effects in Sydney. A teacher instructs them: <strong>"You may use AI to format your bibliography, convert units (e.g. temperature data), and suggest subheadings for structure. You may NOT use AI to write sentences, summarise sources, or draw conclusions. Those steps must be your own."</strong> The instructions are printed on the task sheet and students sign an AI usage declaration.`,
+    answer: 1,
+    feedback_correct: `Correct! This is <strong>Path 1 - Load Reduction Instruction</strong>. The teacher has produced an explicit, written protocol distinguishing permitted AI use (extraneous administrative tasks: bibliography formatting, unit conversion, structural scaffolding) from prohibited AI use (intrinsic learning tasks: writing, summarising, concluding). The signed declaration adds accountability. This is LRI in its clearest classroom form - structured, transparent, and pedagogically purposeful.`,
+    feedback_wrong: `Look at the level of explicit structure the teacher has created: a printed list of what AI can and cannot do, plus a signed declaration. The teacher is not asking students to reflect on their thinking or redesigning AI's role as a provocateur - they are creating clear rules that separate extraneous tasks (bibliography, units, headings) from intrinsic ones (writing and analysis). That deliberate, structured division of labour is <strong>Path 1: Load Reduction Instruction</strong>.`,
+    cite: "Lodge & Loble (2026), p.24 | Martin et al. (2025) | Hong et al. (2025)",
+  },
+];
+
+// State
+let current = 0;
+let score = 0;
+let pathScores = { 1: 0, 2: 0, 3: 0, 0: 0 };
+const pathTotals = { 1: 3, 2: 2, 3: 2, 0: 1 };
+
+function renderScenario(idx) {
+  const sc = scenarios[idx];
+  const stage = document.getElementById('stage');
+  stage.innerHTML = '';
+
+  const card = document.createElement('div');
+  card.className = 'scenario-card';
+
+  // Build choice buttons
+  const choiceItems = [
+    { path: 1, cls: 'p1', label: 'PATH 1', desc: 'Load Reduction Instruction - structured AI task division' },
+    { path: 2, cls: 'p2', label: 'PATH 2', desc: 'Metacognitive Scaffolding - counter the laziness' },
+    { path: 3, cls: 'p3', label: 'PATH 3', desc: 'AI as Thinking Partner - oracle to provocateur' },
+    { path: 0, cls: 'pN', label: 'NONE',   desc: 'This is an example of detrimental offloading' },
+  ];
+
+  let choicesHTML = '<div class="choices">';
+  choiceItems.forEach(ci => {
+    choicesHTML += `
+      <button class="choice-btn ${ci.cls}" onclick="handleChoice(${ci.path}, this)" data-path="${ci.path}">
+        <span class="choice-path-label">${ci.label}</span>
+        <span class="choice-desc">${ci.desc}</span>
+        <span class="result-tick">&#10003;</span>
+      </button>`;
+  });
+  choicesHTML += '</div>';
+
+  const isLast = idx === scenarios.length - 1;
+  const nextLabel = isLast ? 'See Results' : 'Next Scenario';
+
+  card.innerHTML = `
+    <div class="scenario-header">
+      <div class="scenario-num">${sc.id}</div>
+      <div class="scenario-meta">
+        <div class="scenario-subject">${sc.subject}</div>
+        <div class="scenario-text">${sc.text}</div>
+      </div>
+    </div>
+    ${choicesHTML}
+    <div class="feedback" id="feedback-box"></div>
+    <div class="next-wrap" id="next-wrap">
+      <button class="btn-next" onclick="advance()">${nextLabel}</button>
+    </div>
+  `;
+
+  stage.appendChild(card);
+  updateProgress(idx);
+}
+
+function handleChoice(chosen, btnEl) {
+  const sc = scenarios[current];
+  const allBtns = document.querySelectorAll('.choice-btn');
+  const feedbackEl = document.getElementById('feedback-box');
+  const nextWrap = document.getElementById('next-wrap');
+
+  // Disable all
+  allBtns.forEach(b => b.disabled = true);
+
+  const correct = chosen === sc.answer;
+
+  // Style buttons
+  allBtns.forEach(b => {
+    const bPath = parseInt(b.dataset.path);
+    if (bPath === sc.answer) {
+      b.classList.add('is-correct');
+    } else if (bPath === chosen && !correct) {
+      b.classList.add('is-wrong');
+    } else {
+      b.classList.add('is-dim');
+    }
+  });
+
+  // Build feedback
+  let html = '';
+  if (sc.isDistractor) {
+    html = `
+      <div class="feedback-result">
+        <div class="feedback-icon">${correct ? '&#9989;' : '&#8635;'}</div>
+        <div class="feedback-verdict ${correct ? 'ok' : 'bad'}">${correct ? 'Correct - none of the above!' : 'Not quite - read the explanation below.'}</div>
+      </div>
+      <div class="feedback-body">${sc.distractorFeedback}</div>
+      <div class="feedback-cite">${sc.cite}</div>`;
+  } else if (correct) {
+    html = `
+      <div class="feedback-result">
+        <div class="feedback-icon">&#9989;</div>
+        <div class="feedback-verdict ok">Correct!</div>
+      </div>
+      <div class="feedback-body">${sc.feedback_correct}</div>
+      <div class="feedback-cite">${sc.cite}</div>`;
+  } else {
+    html = `
+      <div class="feedback-result">
+        <div class="feedback-icon">&#10060;</div>
+        <div class="feedback-verdict bad">Not quite - here is why:</div>
+      </div>
+      <div class="feedback-body">${sc.feedback_wrong}</div>
+      <div class="feedback-cite">${sc.cite}</div>`;
+  }
+
+  feedbackEl.innerHTML = html;
+  feedbackEl.classList.add('show');
+
+  // Update score
+  if (correct) {
+    score++;
+    pathScores[sc.answer]++;
+  }
+  document.getElementById('score-badge').textContent = `Score: ${score}`;
+
+  // Show next button
+  nextWrap.classList.add('show');
+  nextWrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function advance() {
+  current++;
+  if (current >= scenarios.length) {
+    showResults();
+  } else {
+    renderScenario(current);
+    document.getElementById('stage').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+function updateProgress(idx) {
+  const total = scenarios.length;
+  const pct = (idx / total) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-text').textContent = `Question ${idx + 1} of ${total}`;
+}
+
+function showResults() {
+  document.getElementById('stage').innerHTML = '';
+  document.getElementById('progress-fill').style.width = '100%';
+  document.getElementById('progress-text').textContent = `${scenarios.length} of ${scenarios.length} answered`;
+
+  const panel = document.getElementById('results-panel');
+  panel.style.display = 'block';
+  document.getElementById('final-score').textContent = score;
+
+  const msgs = [
+    [8, "Outstanding! You have a thorough grasp of all three pedagogical pathways and can recognise detrimental offloading too. Your students will be well served by your understanding of purposeful AI integration."],
+    [7, "Excellent work. You clearly understand the distinctions between the three pathways. Review any missed scenarios to sharpen your thinking further."],
+    [6, "Good understanding overall. You are solid on the core concepts - revisit the scenarios where you were unsure to clarify the boundaries between pathways."],
+    [5, "A solid start. Some of the distinctions between pathways can be subtle - particularly between Path 1 and the others. Revisit the feedback for missed items."],
+    [0, "Keep working at it - these distinctions take practice. Re-read the feedback for each scenario carefully, then try again. The differences between pathways become clearer with reflection."],
+  ];
+  let msg = msgs[msgs.length - 1][1];
+  for (const [threshold, m] of msgs) {
+    if (score >= threshold) { msg = m; break; }
+  }
+  document.getElementById('result-message').textContent = msg;
+
+  document.getElementById('path-breakdown').innerHTML = `
+    <div class="path-score-item">
+      <span class="path-score-num p1">${pathScores[1]}/${pathTotals[1]}</span>
+      <div class="path-score-label">Path 1<br>LRI</div>
+    </div>
+    <div class="path-score-item">
+      <span class="path-score-num p2">${pathScores[2]}/${pathTotals[2]}</span>
+      <div class="path-score-label">Path 2<br>Metacognitive</div>
+    </div>
+    <div class="path-score-item">
+      <span class="path-score-num p3">${pathScores[3]}/${pathTotals[3]}</span>
+      <div class="path-score-label">Path 3<br>AI Partner</div>
+    </div>
+    <div class="path-score-item">
+      <span class="path-score-num pN">${pathScores[0]}/${pathTotals[0]}</span>
+      <div class="path-score-label">Distractor<br>None</div>
+    </div>`;
+
+  panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function resetActivity() {
+  current = 0;
+  score = 0;
+  pathScores = { 1: 0, 2: 0, 3: 0, 0: 0 };
+  document.getElementById('score-badge').textContent = 'Score: 0';
+  document.getElementById('results-panel').style.display = 'none';
+  renderScenario(0);
+  window.scrollTo({ behavior: 'smooth', top: 0 });
+}
+
+// Init
+renderScenario(0);
+</script>
+</body>
+</html>
